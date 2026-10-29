@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>ဈေးဗန်း - Shop in one place</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
@@ -12,8 +13,9 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="{{asset('front-asset/css/styles.css')}}" rel="stylesheet" />
+
     </head>
-    <body>
+    <body class="d-flex flex-column min-vh-100">
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container px-4 px-lg-5">
@@ -42,12 +44,42 @@
                         </li>
                     </ul>
                     <form class="d-flex">
-                        <button class="btn btn-outline-dark" type="submit">
+                        <a class="btn btn-outline-dark" href="{{route('items.cart')}}">
                             <i class="bi-cart-fill me-1"></i>
                             Cart
-                            <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
-                        </button>
+                            <span class="badge bg-dark text-white ms-1 rounded-pill" id="item-count">0</span>
+                        </a>
                     </form>
+                   @guest
+ 
+                    <a href="/login" class="btn mx-3">Login</a>
+                    <a href="/register" class="btn btn-dark">Register</a>
+
+                    @else
+                    <div class="mx-3 dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {{Auth::user()->name}}
+          </a>
+          <ul class="dropdown-menu">
+            @if(Auth::user()->role == 'user')
+            <li><a class="dropdown-item" href="#">Profilr</a></li>
+            @else
+            <li><a class="dropdown-item" href="/admin">Admin Panel</a></li>
+            @endif
+            <li><hr class="dropdown-divider"></li>
+            <a class="dropdown-item" href="{{ route('logout') }}"
+                                       onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+                                        {{ __('Logout') }}
+                                    </a>
+
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                        @csrf
+                                    </form>
+          </ul>
+</div>
+        
+                    @endif
                 </div>
             </div>
         </nav>
@@ -60,12 +92,17 @@
 
         
         <!-- Footer-->
-        <footer class="py-5 bg-dark">
-            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+        <footer class="py-5 bg-dark mt-auto">
+            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; ဈေးဗန်း 2026</p></div>
         </footer>
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
         <script src="{{asset('front-asset/js/scripts.js')}}"></script>
+        <script src="https://code.jquery.com/jquery-4.0.0.min.js" integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
+
+        <script src="{{asset('front-asset/js/cart.js')}}"></script>
+        @yield('script')
+
     </body>
 </html>

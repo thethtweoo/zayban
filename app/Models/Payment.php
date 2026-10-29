@@ -19,4 +19,8 @@ class Payment extends Model
         'acc_name'
     ];
 
+    public function orders(){ 
+         return $this->hasMany(Order::class);
+    }
+
 }

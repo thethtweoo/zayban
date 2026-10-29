@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Http\Requests\UserRequest;
 
 class UserController extends Controller
 {
@@ -22,15 +23,29 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.users.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(UserRequest $request)
     {
-        //
+        // dd($request);
+        $users = User::create($request->all());
+
+        //file upload
+        $file_name = time().'.'.$request->profile->extension(); //234566765.jpg
+
+        $upload = $request->profile->move(public_path('images/users/'), $file_name); //folder upload
+
+        if($upload) {
+            $users->profile = "/images/users/".$file_name;
+        }
+
+        $users->save();
+
+        return redirect()->route('admin.users.index');
     }
 
     /**
@@ -46,7 +61,9 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $user = User::find($id);
+        
+        return view('admin.users.edit', compact('user'));
     }
 
     /**
@@ -54,7 +71,26 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        // dd($request);
+        $user = User::find($id);
+        $user->update($request->all());
+
+        if($request->hasFile('profile')) {
+
+             //file upload
+        $file_name = time().'.'.$request->profile->extension(); //234566765.jpg
+
+        $upload = $request->profile->move(public_path('images/users/'), $file_name); //folder upload
+
+        if($upload) {
+            $user->profile = "/images/users/".$file_name;
+        }
+
+        }else {
+            $user->profile = $request->old_profile;
+        }
+        $user->save();
+        return redirect()->route('admin.users.index');
     }
 
     /**
@@ -62,6 +98,8 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::find($id);
+        $user->delete();
+        return redirect()->route('admin.users.index');
     }
 }
